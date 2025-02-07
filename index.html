@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Content Manager Tool - Clients, Projects & Creatives</title>
+  <title>Content Manager Tool - Protected</title>
   <style>
     /* Basic CSS styling for layout and responsiveness */
     body {
@@ -67,7 +67,8 @@
       margin-bottom: 5px;
     }
     input[type="text"],
-    input[type="file"] {
+    input[type="file"],
+    input[type="password"] {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -100,13 +101,36 @@
       max-width: 100px;
       max-height: 100px;
     }
+    /* Login Section Styles */
+    #login-section {
+      width: 300px;
+      margin: 100px auto;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      border-radius: 4px;
+      text-align: center;
+    }
+    #login-section h2 {
+      margin-top: 0;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Content Manager Tool</h1>
-  </header>
-  <div id="content">
+  <!-- Login Section (shown first) -->
+  <div id="login-section">
+    <h2>Please Enter Password</h2>
+    <input type="password" id="login-password" placeholder="Password">
+    <br>
+    <button id="login-button">Login</button>
+    <p id="login-error" style="color:red; display:none;">Incorrect password. Please try again.</p>
+  </div>
+  
+  <!-- Main Content (hidden until login is successful) -->
+  <div id="content" style="display:none;">
+    <header>
+      <h1>Content Manager Tool</h1>
+    </header>
     <!-- Client Section -->
     <div id="client-section" class="section">
       <h2>Clients</h2>
@@ -170,6 +194,24 @@
   
   <script>
     /**************************************************************
+     * Password Protection
+     **************************************************************/
+    // Set your password here (this is a basic, client-side password)
+    const correctPassword = "secret123";
+
+    // Handle login button click
+    document.getElementById("login-button").addEventListener("click", function() {
+      const enteredPassword = document.getElementById("login-password").value;
+      if (enteredPassword === correctPassword) {
+        // Hide login section and show main content
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("content").style.display = "block";
+      } else {
+        document.getElementById("login-error").style.display = "block";
+      }
+    });
+
+    /**************************************************************
      * Data Structure and Local Storage Management
      **************************************************************/
     // The dataStore includes clients; each client has projects,
@@ -203,6 +245,7 @@
         showStatus('No stored data found. Pre-populated with 10 default clients.');
         saveData();
       }
+      renderClients();
     }
 
     // Save data to localStorage
@@ -520,8 +563,10 @@
     /**************************************************************
      * Initialization
      **************************************************************/
+    // Load data after the user has successfully logged in.
+    // (If the user refreshes the page and the login is required again,
+    //  the process repeats.)
     loadData();
-    renderClients();
   </script>
 </body>
 </html>
