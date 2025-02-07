@@ -355,15 +355,22 @@ function saveData() {
 
     // Add a new client via prompt
     document.getElementById('add-client-button').addEventListener('click', () => {
-      const clientName = prompt('Enter new client name:');
-      if (clientName) {
-        const newClient = { id: generateId(), name: clientName.trim(), projects: [] };
-        // Using unshift so the new client appears at the top.
-        dataStore.clients.unshift(newClient);
-        saveData();
-        renderClients();
-      }
-    });
+  const clientName = prompt('Enter new client name:');
+  if (clientName) {
+    const newClient = {
+      name: clientName.trim(),
+      projects: [],
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() // For sorting
+    };
+
+    db.collection("clients").add(newClient)
+      .then(() => {
+        renderClients(); // Refresh UI after adding
+      })
+      .catch(error => console.error("Error adding client:", error));
+  }
+});
+
 
     /**************************************************************
      * Project Section Functions
