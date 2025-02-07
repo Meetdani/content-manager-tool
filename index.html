@@ -18,6 +18,18 @@
   measurementId: "G-B9W5XG3G8C"
 };
 
+  <script>
+  db.collection("test").add({
+    name: "Test Entry",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    console.log("Firebase is working!");
+  }).catch((error) => {
+    console.error("Error:", error);
+  });
+</script>
+
+
   // Initialize Firebase
   const app = firebase.initializeApp(firebaseConfig);
 
