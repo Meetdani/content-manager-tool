@@ -1,620 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
- <!-- Firebase App (the core Firebase SDK) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<!-- Add Firestore -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
- <script>
-  // Your Firebase configuration (replace with your actual config)
-  var firebaseConfig = {
-    apiKey: "AIzaSyAJRGM_vToOyUyQ3jtDmPe_mp9vYDHnZRk",
-    authDomain: "meet-cms.firebaseapp.com",
-    projectId: "meet-cms",
-    storageBucket: "meet-cms.firebasestorage.app",
-    messagingSenderId: "587862242729",
-    appId: "1:587862242729:web:ecd1c2da6cde2eca4580b8"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  // Initialize Firestore
-  var db = firebase.firestore();
-</script>
-
-
- <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Content Manager Tool - Protected</title>
-  <style>
-    /* Basic CSS styling for layout and responsiveness */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f7f7f7;
-    }
-    header {
-      background-color: #4CAF50;
-      color: white;
-      padding: 1em;
-      text-align: center;
-    }
-    #content {
-      padding: 20px;
-    }
-    .section {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    button {
-      padding: 6px 12px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 3px;
-      margin: 5px 2px;
-      font-size: 0.9em;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    ul, table {
-      width: 100%;
-      padding: 0;
-      margin: 0;
-      border-collapse: collapse;
-    }
-    li {
-      list-style: none;
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    li:last-child {
-      border-bottom: none;
-    }
-    li span.name {
-      cursor: pointer;
-      flex: 1;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input[type="text"],
-    input[type="file"],
-    input[type="password"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
-    #status {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      background: white;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      font-size: 0.9em;
-    }
-    /* Table styling for creative entries */
-    table {
-      width: 100%;
-      border: 1px solid #ccc;
-    }
-    table th, table td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    table th {
-      background-color: #f2f2f2;
-    }
-    img {
-      max-width: 100px;
-      max-height: 100px;
-    }
-    /* Login Section Styles */
-    #login-section {
-      width: 300px;
-      margin: 100px auto;
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      border-radius: 4px;
-      text-align: center;
-    }
-    #login-section h2 {
-      margin-top: 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Management Tool</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 10px; text-align: left; }
+        .form-group { margin-bottom: 15px; }
+        button { padding: 10px; cursor: pointer; }
+    </style>
 </head>
 <body>
-  <!-- Login Section (shown first) -->
-  <div id="login-section">
-    <h2>Please Enter Password</h2>
-    <input type="password" id="login-password" placeholder="Password">
-    <br>
-    <button id="login-button">Login</button>
-    <p id="login-error" style="color:red; display:none;">Incorrect password. Please try again.</p>
-  </div>
-  
-  <!-- Main Content (hidden until login is successful) -->
-  <div id="content" style="display:none;">
-    <header>
-      <h1>Content Manager Tool</h1>
-    </header>
-    <!-- Client Section -->
-    <div id="client-section" class="section">
-      <h2>Clients</h2>
-      <button id="add-client-button">Add Client</button>
-      <ul id="client-list"></ul>
+    <div class="container">
+        <h2>Client Management</h2>
+        <div class="form-group">
+            <input type="text" id="clientName" placeholder="Enter Client Name">
+            <button onclick="addClient()">Add Client</button>
+        </div>
+        <ul id="clientList"></ul>
+
+        <h2>Project Management</h2>
+        <div class="form-group">
+            <select id="clientSelect"></select>
+            <input type="text" id="projectName" placeholder="Enter Project Name">
+            <button onclick="addProject()">Add Project</button>
+        </div>
+        <ul id="projectList"></ul>
     </div>
-    
-    <!-- Project Section -->
-    <div id="project-section" class="section" style="display:none;">
-      <button id="back-to-clients-button">Back to Clients</button>
-      <h2 id="client-name-heading"></h2>
-      <h3>Projects</h3>
-      <button id="add-project-button">Add Project</button>
-      <ul id="project-list"></ul>
-    </div>
-    
-    <!-- Creative Section -->
-    <div id="creative-section" class="section" style="display:none;">
-      <button id="back-to-projects-button">Back to Projects</button>
-      <h2 id="project-name-heading"></h2>
-      <h3>Creatives</h3>
-      <!-- Creative Entry Form -->
-      <form id="add-creative-form">
-        <div>
-          <label for="creative-category">Category:</label>
-          <input type="text" id="creative-category">
-        </div>
-        <div>
-          <label for="creative-tagline">Tagline:</label>
-          <input type="text" id="creative-tagline" required>
-        </div>
-        <div>
-          <label for="creative-caption">Caption:</label>
-          <input type="text" id="creative-caption">
-        </div>
-        <div>
-          <label for="creative-image">Image (JPG):</label>
-          <input type="file" id="creative-image" accept="image/jpeg">
-        </div>
-        <button type="submit">Add Creative</button>
-      </form>
-      <!-- Creative Entries Table -->
-      <table id="creative-table">
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Tagline</th>
-            <th>Caption</th>
-            <th>Image</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Creative entries will be inserted here -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-  
-  <div id="status"></div>
-  
-  <script>
-    /**************************************************************
-     * Password Protection
-     **************************************************************/
-    // Set your password here (this is a basic, client-side password)
-    const correctPassword = "secret123";
 
-    // Handle login button click
-    document.getElementById("login-button").addEventListener("click", function() {
-      const enteredPassword = document.getElementById("login-password").value;
-      if (enteredPassword === correctPassword) {
-        // Hide login section and show main content
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("content").style.display = "block";
-      } else {
-        document.getElementById("login-error").style.display = "block";
-      }
-    });
-
-    /**************************************************************
-     * Data Structure and Local Storage Management
-     **************************************************************/
-    // The dataStore includes clients; each client has projects,
-    // and each project contains creative entries.
-    let dataStore = { clients: [] };
-    let selectedClient = null;
-    let selectedProject = null;
-
-    // Load data from localStorage
-    function loadData() {
-      const storedData = localStorage.getItem('content_manager_data');
-      if (storedData) {
-        try {
-          dataStore = JSON.parse(storedData);
-          showStatus('Data loaded successfully.');
-        } catch (e) {
-          dataStore = { clients: [] };
-          showStatus('Error parsing stored data. Resetting data.', true);
-          saveData();
-        }
-      } else {
-        dataStore = { clients: [] };
-        // Pre-populate with 10 default clients if none exist
-        for (let i = 1; i <= 10; i++) {
-          dataStore.clients.push({
-            id: generateId(),
-            name: 'Client ' + i,
-            projects: []
-          });
-        }
-        showStatus('No stored data found. Pre-populated with 10 default clients.');
-        saveData();
-      }
-      renderClients();
-    }
-
-    // Save data to localStorage
-    function saveData() {
-      localStorage.setItem('content_manager_data', JSON.stringify(dataStore));
-      showStatus('Data saved locally.');
-    }
-
-    // Generate a simple unique ID
-    function generateId() {
-      return '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    // Display status messages in the bottom-left
-    function showStatus(message, isError) {
-      const statusDiv = document.getElementById('status');
-      statusDiv.textContent = message;
-      statusDiv.style.color = isError ? 'red' : 'green';
-      setTimeout(() => {
-        statusDiv.textContent = '';
-      }, 5000);
-    }
-
-    /**************************************************************
-     * Client Section Functions
-     **************************************************************/
-    function renderClients() {
-      const clientList = document.getElementById('client-list');
-      clientList.innerHTML = '';
-      dataStore.clients.forEach(client => {
-        const li = document.createElement('li');
-        // Create a clickable span for the client name.
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = client.name;
-        nameSpan.className = 'name';
-        nameSpan.addEventListener('click', () => {
-          selectedClient = client;
-          showProjectSection();
-        });
-        li.appendChild(nameSpan);
-        
-        // Edit button for client
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
-        editButton.addEventListener('click', (event) => {
-          // Prevent triggering the nameSpan click event.
-          event.stopPropagation();
-          const newName = prompt('Edit client name:', client.name);
-          if (newName) {
-            client.name = newName.trim();
-            saveData();
-            renderClients();
-          }
-        });
-        li.appendChild(editButton);
-        
-        // Delete button for client
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.addEventListener('click', (event) => {
-          event.stopPropagation();
-          if (confirm('Are you sure you want to delete this client and all its projects?')) {
-            dataStore.clients = dataStore.clients.filter(c => c.id !== client.id);
-            saveData();
-            renderClients();
-          }
-        });
-        li.appendChild(deleteButton);
-        
-        clientList.appendChild(li);
-      });
-    }
-
-    // Add a new client via prompt
-    document.getElementById('add-client-button').addEventListener('click', () => {
-      const clientName = prompt('Enter new client name:');
-      if (clientName) {
-        const newClient = { id: generateId(), name: clientName.trim(), projects: [] };
-        // Using unshift so the new client appears at the top.
-        dataStore.clients.unshift(newClient);
-        saveData();
-        renderClients();
-      }
-    });
-
-    /**************************************************************
-     * Project Section Functions
-     **************************************************************/
-    function showProjectSection() {
-      document.getElementById('client-section').style.display = 'none';
-      document.getElementById('creative-section').style.display = 'none';
-      document.getElementById('project-section').style.display = 'block';
-      document.getElementById('client-name-heading').textContent = 'Projects for ' + selectedClient.name;
-      renderProjects();
-    }
-
-    function renderProjects() {
-      const projectList = document.getElementById('project-list');
-      projectList.innerHTML = '';
-      if (selectedClient.projects.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = 'No projects. Please add one.';
-        projectList.appendChild(li);
-      } else {
-        selectedClient.projects.forEach(project => {
-          const li = document.createElement('li');
-          // Create a clickable span for the project name.
-          const nameSpan = document.createElement('span');
-          nameSpan.textContent = project.name;
-          nameSpan.className = 'name';
-          nameSpan.style.cursor = 'pointer';
-          nameSpan.addEventListener('click', () => {
-            selectedProject = project;
-            showCreativeSection();
-          });
-          li.appendChild(nameSpan);
-          
-          // Edit button for project
-          const editButton = document.createElement('button');
-          editButton.textContent = 'Edit';
-          editButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const newName = prompt('Edit project name:', project.name);
-            if (newName) {
-              project.name = newName.trim();
-              saveData();
-              renderProjects();
-            }
-          });
-          li.appendChild(editButton);
-          
-          // Delete button for project
-          const deleteButton = document.createElement('button');
-          deleteButton.textContent = 'Delete';
-          deleteButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (confirm('Are you sure you want to delete this project and all its creatives?')) {
-              selectedClient.projects = selectedClient.projects.filter(p => p.id !== project.id);
-              saveData();
-              renderProjects();
-            }
-          });
-          li.appendChild(deleteButton);
-          
-          projectList.appendChild(li);
-        });
-      }
-    }
-
-    // Add a new project for the selected client via prompt
-    document.getElementById('add-project-button').addEventListener('click', () => {
-      const projectName = prompt('Enter project name (e.g., Feb Month Content):');
-      if (projectName) {
-        const newProject = { id: generateId(), name: projectName.trim(), creatives: [] };
-        selectedClient.projects.push(newProject);
-        saveData();
-        renderProjects();
-      }
-    });
-
-    // Back button from projects to clients
-    document.getElementById('back-to-clients-button').addEventListener('click', () => {
-      selectedClient = null;
-      document.getElementById('project-section').style.display = 'none';
-      document.getElementById('creative-section').style.display = 'none';
-      document.getElementById('client-section').style.display = 'block';
-      renderClients();
-    });
-
-    /**************************************************************
-     * Creative Section Functions
-     **************************************************************/
-    function showCreativeSection() {
-      document.getElementById('client-section').style.display = 'none';
-      document.getElementById('project-section').style.display = 'none';
-      document.getElementById('creative-section').style.display = 'block';
-      document.getElementById('project-name-heading').textContent = 'Creatives for Project: ' + selectedProject.name;
-      renderCreatives();
-    }
-
-    function renderCreatives() {
-      const creativeTableBody = document.querySelector('#creative-table tbody');
-      creativeTableBody.innerHTML = '';
-      if (selectedProject.creatives.length === 0) {
-        const row = document.createElement('tr');
-        const cell = document.createElement('td');
-        cell.colSpan = 5;
-        cell.textContent = 'No creatives. Please add one.';
-        row.appendChild(cell);
-        creativeTableBody.appendChild(row);
-      } else {
-        selectedProject.creatives.forEach(creative => {
-          const row = document.createElement('tr');
-          // Category cell
-          let cell = document.createElement('td');
-          cell.textContent = creative.category || '';
-          row.appendChild(cell);
-          // Tagline cell
-          cell = document.createElement('td');
-          cell.textContent = creative.tagline;
-          row.appendChild(cell);
-          // Caption cell
-          cell = document.createElement('td');
-          cell.textContent = creative.caption;
-          row.appendChild(cell);
-          // Image cell
-          cell = document.createElement('td');
-          if (creative.image) {
-            const img = document.createElement('img');
-            img.src = creative.image;
-            cell.appendChild(img);
-          }
-          row.appendChild(cell);
-          // Actions cell
-          cell = document.createElement('td');
-          const editBtn = document.createElement('button');
-          editBtn.textContent = 'Edit';
-          editBtn.addEventListener('click', () => { editCreative(creative.id); });
-          cell.appendChild(editBtn);
-          const deleteBtn = document.createElement('button');
-          deleteBtn.textContent = 'Delete';
-          deleteBtn.addEventListener('click', () => { deleteCreative(creative.id); });
-          cell.appendChild(deleteBtn);
-          row.appendChild(cell);
-          creativeTableBody.appendChild(row);
-        });
-      }
-    }
-
-    // Add a new creative entry (category, tagline, caption, image)
-    document.getElementById('add-creative-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const categoryInput = document.getElementById('creative-category');
-      const taglineInput = document.getElementById('creative-tagline');
-      const captionInput = document.getElementById('creative-caption');
-      const imageInput = document.getElementById('creative-image');
-
-      const category = categoryInput.value.trim();
-      const tagline = taglineInput.value.trim();
-      const caption = captionInput.value.trim();
-
-      if (!tagline) {
-        alert('Tagline is required.');
-        return;
-      }
-
-      // Helper function: add creative entry after processing image (if any)
-      const addCreativeEntry = (imageDataURL) => {
-        const newCreative = {
-          id: generateId(),
-          category: category,
-          tagline: tagline,
-          caption: caption,
-          image: imageDataURL || ''
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyAJRGM_vToOyUyQ3jtDmPe_mp9vYDHnZRk",
+            authDomain: "meet-cms.firebaseapp.com",
+            projectId: "meet-cms",
+            storageBucket: "meet-cms.firebasestorage.app",
+            messagingSenderId: "587862242729",
+            appId: "1:587862242729:web:ecd1c2da6cde2eca4580b8"
         };
-        selectedProject.creatives.push(newCreative);
-        saveData();
-        renderCreatives();
-        // Reset form fields
-        categoryInput.value = '';
-        taglineInput.value = '';
-        captionInput.value = '';
-        imageInput.value = '';
-      };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
 
-      // If an image is selected, convert it to a data URL; otherwise, add entry directly.
-      if (imageInput.files && imageInput.files[0]) {
-        const file = imageInput.files[0];
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          addCreativeEntry(event.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        addCreativeEntry('');
-      }
-    });
+        function addClient() {
+            let clientName = document.getElementById("clientName").value;
+            if (clientName === "") return;
+            db.collection("clients").add({ name: clientName })
+                .then(() => {
+                    document.getElementById("clientName").value = "";
+                    loadClients();
+                });
+        }
 
-    // Edit a creative entry (category, tagline, caption)
-    function editCreative(creativeId) {
-      const creative = selectedProject.creatives.find(c => c.id === creativeId);
-      if (!creative) return;
-      const newCategory = prompt('Edit Category:', creative.category || '');
-      if (newCategory === null) return;
-      const newTagline = prompt('Edit Tagline:', creative.tagline);
-      if (newTagline === null) return;
-      const newCaption = prompt('Edit Caption:', creative.caption);
-      if (newCaption === null) return;
-      creative.category = newCategory.trim();
-      creative.tagline = newTagline.trim();
-      creative.caption = newCaption.trim();
-      // (For simplicity, image editing is not handled in this version.)
-      saveData();
-      renderCreatives();
-    }
-    window.editCreative = editCreative;
+        function loadClients() {
+            let clientSelect = document.getElementById("clientSelect");
+            let clientList = document.getElementById("clientList");
+            clientSelect.innerHTML = "";
+            clientList.innerHTML = "";
+            db.collection("clients").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    let client = doc.data();
+                    let option = document.createElement("option");
+                    option.value = doc.id;
+                    option.textContent = client.name;
+                    clientSelect.appendChild(option);
+                    let li = document.createElement("li");
+                    li.textContent = client.name;
+                    clientList.appendChild(li);
+                });
+            });
+        }
 
-    // Delete a creative entry
-    function deleteCreative(creativeId) {
-      if (!confirm('Are you sure you want to delete this creative entry?')) return;
-      selectedProject.creatives = selectedProject.creatives.filter(c => c.id !== creativeId);
-      saveData();
-      renderCreatives();
-    }
-    window.deleteCreative = deleteCreative;
+        function addProject() {
+            let clientId = document.getElementById("clientSelect").value;
+            let projectName = document.getElementById("projectName").value;
+            if (clientId === "" || projectName === "") return;
+            db.collection("clients").doc(clientId).collection("projects").add({ name: projectName })
+                .then(() => {
+                    document.getElementById("projectName").value = "";
+                    loadProjects(clientId);
+                });
+        }
 
-    // Back button from creatives to projects
-    document.getElementById('back-to-projects-button').addEventListener('click', () => {
-      selectedProject = null;
-      document.getElementById('creative-section').style.display = 'none';
-      document.getElementById('project-section').style.display = 'block';
-      renderProjects();
-    });
+        function loadProjects(clientId) {
+            let projectList = document.getElementById("projectList");
+            projectList.innerHTML = "";
+            db.collection("clients").doc(clientId).collection("projects").get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        let project = doc.data();
+                        let li = document.createElement("li");
+                        li.textContent = project.name;
+                        projectList.appendChild(li);
+                    });
+                });
+        }
 
-    /**************************************************************
-     * Initialization
-     **************************************************************/
-    // Load data after the user has successfully logged in.
-    // (If the user refreshes the page and the login is required again,
-    //  the process repeats.)
-    loadData();
-  </script>
-
- <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCZskMJXdndv8z9GydWimAPZfDDKSNoD1E",
-    authDomain: "meetdani-5f50b.firebaseapp.com",
-    projectId: "meetdani-5f50b",
-    storageBucket: "meetdani-5f50b.firebasestorage.app",
-    messagingSenderId: "1064066786930",
-    appId: "1:1064066786930:web:aa34b9815afa09d4e744eb",
-    measurementId: "G-1NBTN2PD0N"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
+        loadClients();
+    </script>
 </body>
 </html>
