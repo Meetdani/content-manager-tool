@@ -1,6 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<!-- Add Firestore -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+  // Your Firebase configuration (replace with your actual config)
+  var firebaseConfig = {
+    apiKey: "AIzaSyAJRGM_vToOyUyQ3jtDmPe_mp9vYDHnZRk",
+    authDomain: "meet-cms.firebaseapp.com",
+    projectId: "meet-cms",
+    storageBucket: "meet-cms.firebasestorage.app",
+    messagingSenderId: "587862242729",
+    appId: "1:587862242729:web:ecd1c2da6cde2eca4580b8"
+    measurementId: "G-PLR9CYX84Z"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  // Initialize Firestore
+  var db = firebase.firestore();
+</script>
+
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Content Manager Tool - Protected</title>
