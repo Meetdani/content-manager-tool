@@ -3,103 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative Management Tool</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <title>Tagline Manager</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 800px; margin: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid black; padding: 10px; text-align: left; }
-        .form-group { margin-bottom: 15px; }
-        button { padding: 10px; cursor: pointer; }
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #auth-container, #content-container { margin: 20px; }
+        input, button { margin: 10px; padding: 8px; }
+        ul { list-style: none; padding: 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Client Management</h2>
-        <div class="form-group">
-            <input type="text" id="clientName" placeholder="Enter Client Name">
-            <button onclick="addClient()">Add Client</button>
-        </div>
-        <ul id="clientList"></ul>
-
-        <h2>Project Management</h2>
-        <div class="form-group">
-            <select id="clientSelect"></select>
-            <input type="text" id="projectName" placeholder="Enter Project Name">
-            <button onclick="addProject()">Add Project</button>
-        </div>
-        <ul id="projectList"></ul>
+    <div id="auth-container">
+        <input type="email" id="email" placeholder="Enter email">
+        <input type="password" id="password" placeholder="Enter password">
+        <button onclick="signUp()">Sign Up</button>
+        <button onclick="signIn()">Sign In</button>
+        <button onclick="signOut()">Sign Out</button>
+    </div>
+    
+    <div id="content-container" style="display:none;">
+        <input type="text" id="tagline" placeholder="Enter tagline">
+        <input type="file" id="imageUpload">
+        <button onclick="addTagline()">Add Tagline</button>
+        <ul id="tagline-list"></ul>
     </div>
 
     <script>
-        var firebaseConfig = {
-            apiKey: "AIzaSyAJRGM_vToOyUyQ3jtDmPe_mp9vYDHnZRk",
-            authDomain: "meet-cms.firebaseapp.com",
-            projectId: "meet-cms",
-            storageBucket: "meet-cms.firebasestorage.app",
-            messagingSenderId: "587862242729",
-            appId: "1:587862242729:web:ecd1c2da6cde2eca4580b8"
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
-        firebase.initializeApp(firebaseConfig);
-        var db = firebase.firestore();
 
-        function addClient() {
-            let clientName = document.getElementById("clientName").value;
-            if (clientName === "") return;
-            db.collection("clients").add({ name: clientName })
-                .then(() => {
-                    document.getElementById("clientName").value = "";
-                    loadClients();
-                });
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        function signUp() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => alert("User signed up!"))
+                .catch(error => alert(error.message));
         }
 
-        function loadClients() {
-            let clientSelect = document.getElementById("clientSelect");
-            let clientList = document.getElementById("clientList");
-            clientSelect.innerHTML = "";
-            clientList.innerHTML = "";
-            db.collection("clients").get().then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    let client = doc.data();
-                    let option = document.createElement("option");
-                    option.value = doc.id;
-                    option.textContent = client.name;
-                    clientSelect.appendChild(option);
-                    let li = document.createElement("li");
-                    li.textContent = client.name;
-                    clientList.appendChild(li);
-                });
+        function signIn() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert("Signed in!");
+                    document.getElementById("auth-container").style.display = "none";
+                    document.getElementById("content-container").style.display = "block";
+                    loadTaglines();
+                })
+                .catch(error => alert(error.message));
+        }
+
+        function signOut() {
+            auth.signOut().then(() => {
+                alert("Signed out!");
+                document.getElementById("auth-container").style.display = "block";
+                document.getElementById("content-container").style.display = "none";
             });
         }
 
-        function addProject() {
-            let clientId = document.getElementById("clientSelect").value;
-            let projectName = document.getElementById("projectName").value;
-            if (clientId === "" || projectName === "") return;
-            db.collection("clients").doc(clientId).collection("projects").add({ name: projectName })
-                .then(() => {
-                    document.getElementById("projectName").value = "";
-                    loadProjects(clientId);
-                });
-        }
-
-        function loadProjects(clientId) {
-            let projectList = document.getElementById("projectList");
-            projectList.innerHTML = "";
-            db.collection("clients").doc(clientId).collection("projects").get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        let project = doc.data();
-                        let li = document.createElement("li");
-                        li.textContent = project.name;
-                        projectList.appendChild(li);
+        function addTagline() {
+            const tagline = document.getElementById("tagline").value;
+            const file = document.getElementById("imageUpload").files[0];
+            if (!tagline) return alert("Enter a tagline");
+            
+            if (file) {
+                const storageRef = storage.ref('images/' + file.name);
+                storageRef.put(file).then(snapshot => {
+                    snapshot.ref.getDownloadURL().then(url => {
+                        saveTaglineToDB(tagline, url);
                     });
                 });
+            } else {
+                saveTaglineToDB(tagline, "");
+            }
         }
 
-        loadClients();
+        function saveTaglineToDB(tagline, imageUrl) {
+            db.collection("taglines").add({ text: tagline, image: imageUrl })
+                .then(() => {
+                    alert("Tagline added!");
+                    document.getElementById("tagline").value = "";
+                    document.getElementById("imageUpload").value = "";
+                    loadTaglines();
+                })
+                .catch(error => alert(error.message));
+        }
+
+        function loadTaglines() {
+            db.collection("taglines").get().then(snapshot => {
+                const list = document.getElementById("tagline-list");
+                list.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `${doc.data().text} <br> <img src="${doc.data().image}" width="100">`;
+                    list.appendChild(li);
+                });
+            });
+        }
     </script>
 </body>
 </html>
