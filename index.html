@@ -24,6 +24,18 @@
   var db = firebase.firestore();
 </script>
 
+  <script>
+  db.collection("test").add({
+    name: "Test Entry",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    console.log("Firebase is working!");
+  }).catch((error) => {
+    console.error("Error:", error);
+  });
+</script>
+
+
   
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
