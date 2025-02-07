@@ -16,23 +16,12 @@
     storageBucket: "meet-cms.firebasestorage.app",
     messagingSenderId: "587862242729",
     appId: "1:587862242729:web:ecd1c2da6cde2eca4580b8"
-    measurementId: "G-PLR9CYX84Z"
+  
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   // Initialize Firestore
   var db = firebase.firestore();
-</script>
-
-  <script>
-  db.collection("test").add({
-    name: "Test Entry",
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    console.log("Firebase is working!");
-  }).catch((error) => {
-    console.error("Error:", error);
-  });
 </script>
 
 
