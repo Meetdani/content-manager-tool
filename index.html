@@ -258,42 +258,44 @@
 
     // Load data from localStorage
     function loadData() {
-      const storedData = localStorage.getItem('content_manager_data');
-      if (storedData) {
-        try {
-          dataStore = JSON.parse(storedData);
-          showStatus('Data loaded successfully.');
-        } catch (e) {
-          dataStore = { clients: [] };
-          showStatus('Error parsing stored data. Resetting data.', true);
-          saveData();
-        }
+  db.collection("content_manager").doc("data").get()
+    .then((doc) => {
+      if (doc.exists) {
+        dataStore = doc.data();
+        showStatus("Data loaded from Firestore.");
       } else {
+        // Initialize with default data if no document exists
         dataStore = { clients: [] };
-        // Pre-populate with 10 default clients if none exist
         for (let i = 1; i <= 10; i++) {
           dataStore.clients.push({
             id: generateId(),
-            name: 'Client ' + i,
+            name: "Client " + i,
             projects: []
           });
         }
-        showStatus('No stored data found. Pre-populated with 10 default clients.');
-        saveData();
+        saveData(); // Save default data
+        showStatus("Default data initialized.");
       }
-      renderClients();
-    }
+      renderClients(); // Update UI with loaded data
+    })
+    .catch((error) => {
+      console.error("Error getting document:", error);
+      showStatus("Error loading data.", true);
+    });
+}
 
     // Save data to localStorage
-    function saveData() {
-      localStorage.setItem('content_manager_data', JSON.stringify(dataStore));
-      showStatus('Data saved locally.');
-    }
+function saveData() {
+  db.collection("content_manager").doc("data").set(dataStore)
+    .then(() => {
+      showStatus("Data saved to Firestore.");
+    })
+    .catch((error) => {
+      console.error("Error writing document: ", error);
+      showStatus("Error saving data.", true);
+    });
+}
 
-    // Generate a simple unique ID
-    function generateId() {
-      return '_' + Math.random().toString(36).substr(2, 9);
-    }
 
     // Display status messages in the bottom-left
     function showStatus(message, isError) {
@@ -603,6 +605,11 @@
     // (If the user refreshes the page and the login is required again,
     //  the process repeats.)
     loadData();
+
+    window.onload = function () {
+  loadData();
+};
+
   </script>
 </body>
 </html>
